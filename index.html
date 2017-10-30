@@ -23,6 +23,54 @@
                 width: 100%;
                 background-color: rgb(255, 255, 255);
             }
+            .footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 5%;
+                background-color: rgba(255, 255, 255, 0);
+                text-align: center;
+                vertical-align: middle;
+            }
+            .footer>div {
+                display: inline-block;
+                height: 4vh;
+                width: 4vh;
+                background-color: gray;
+                -webkit-border-radius: 100px;
+                -moz-border-radius: 100px;
+                -o-border-radius: 100px;
+                -ms-border-radius: 100px;
+                -khtml-border-radius: 100px;
+                border-radius: 100px;
+                margin: 0 5;
+                border: 1.5px solid #fff;
+                -webkit-box-shadow: 0 0 1px 1px #afafaf;
+                -moz-box-shadow: 0 0 1px 1px #afafaf;
+                -o-box-shadow: 0 0 1px 1px #afafaf;
+                -ms-box-shadow: 0 0 1px 1px #afafaf;
+                -khtml-box-shadow: 0 0 1px 1px #afafaf;
+                box-shadow: 0 0 1px 1px #afafaf;
+                text-align: center;
+            }
+            .footer>div span {
+                display: block;
+                position: relative;
+                left: 0;
+                top: -4vh;
+                visibility: hidden;
+                white-space: nowrap;
+                width: auto;
+                transform: translateX(-50%);
+                text-align: center;
+            }
+            .footer>div:hover {
+                background-color: lightblue;
+            }
+            .footer>div:hover span {
+                visibility: visible;
+            }
         </style>
     </head>
     <body>
@@ -39,6 +87,10 @@
             <div><h3>Content 2</h3></div>
         </div>
 
+        <div class="footer">
+            <div><span>遊戲理念</span></div>
+            <div><span>成員介紹</span></div>
+        </div>
         <script
         src="https://code.jquery.com/jquery-3.2.1.js"
         integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE="
@@ -67,16 +119,22 @@
         var wheel = new Wheel();
         wheel.change = function(prefix) {
             document.removeEventListener(wheel.event_name,wheel.handler);
+            //$(document).off('scroll', wheel.handler);
             wheel.running = true;
             $('body').animate({
                 scrollTop : prefix + "=" + $(window).height()
             },800,()=>{
                 document.addEventListener(wheel.event_name,wheel.handler);
+                //$(document).on('scroll', wheel.handler);
                 wheel.running = false;
             });
         };
         wheel.handler = function(event) {
+            event.preventDefault();
             var delta = event.deltaY || event.wheelDelta || event.detail;
+            
+            console.log(delta);
+            console.log(event);
             wheel.count += (delta / Math.abs(delta));                
             if (Math.abs(wheel.count) >= wheel.count_threshold) {
                 var prefix = "";
@@ -93,9 +151,10 @@
             }
         };
         document.addEventListener(wheel.event_name,wheel.handler);
+        //$(document).on('scroll', wheel.handler);
         $(document).ready( () => {
 
-            document.body.scrollTop = 0;            
+            //document.body.scrollTop = 0;            
             $(document).keydown(event => {
                 console.log(event.which);
                 switch(event.which) {
@@ -109,6 +168,23 @@
                         break;
                     default:
                         break;
+                }
+            });
+
+            $('.footer>div').click(function() {
+                var index = $(this).index();
+                console.log("click "+index);
+                if (document.body.scrollTop != $(window).height()*index) {
+                    document.removeEventListener(wheel.event_name,wheel.handler);
+                    //$(document).off('scroll', wheel.handler);
+                    wheel.running = true;
+                    $('body').animate({
+                        scrollTop : $(window).height()*index
+                    },800,()=>{
+                        document.addEventListener(wheel.event_name,wheel.handler);
+                        //$(document).on('scroll', wheel.handler);
+                        wheel.running = false;
+                    });
                 }
             });
         });
