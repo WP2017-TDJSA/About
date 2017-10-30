@@ -1,0 +1,119 @@
+<html>
+    <head>
+        <style type="text/css">
+            body {
+                padding: 0;
+                margin: 0;
+                height: 100%;
+                width: 100%;
+                overflow: hidden;
+            }
+            .center_all {
+                display:flex;
+                align-items:center;
+                justify-content:center;
+            }
+            .title {
+                height: 15%;
+                width: 100%;
+                background-color: rgb(243, 146, 19);
+            }
+            .content {
+                height: 85%;
+                width: 100%;
+                background-color: rgb(255, 255, 255);
+            }
+        </style>
+    </head>
+    <body>
+        <div class="title center_all">
+            <div><h1>Titie 1</h1></div>
+        </div>
+        <div class="content center_all">
+            <div><h3>Content 1</h3></div>
+        </div>
+        <div class="title center_all">
+            <div><h1>Title 2</h1></div>
+        </div>
+        <div class="content center_all">
+            <div><h3>Content 2</h3></div>
+        </div>
+
+        <script
+        src="https://code.jquery.com/jquery-3.2.1.js"
+        integrity="sha256-DZAnKJ/6XZ9si04Hgrsxu/8s717jcIzLy3oi35EouyE="
+        crossorigin="anonymous"></script>
+       
+        <script type="text/javascript">
+        function Wheel() {
+            this.count = 0;
+            this.count_threshold = 2;
+            this.inverse_wheel_direction = false;
+            var wheel_event_name;
+            if (document.onmousewheel === null && window.addEventListener === undefined) {
+                // IE 8, note that it is test onmousewheel strictly equals to null
+                wheel_event_name = 'onmousewheel';
+            }  else if (!!window.WheelEvent) {
+                // Safari, Chrome
+                wheel_event_name = 'mousewheel';
+            } else {
+                // Firefox 16 and earlier version
+                wheel_event_name = 'DOMMouseScroll';
+                this.inverse_wheel_direction = true;
+            }
+            this.event_name = wheel_event_name;
+            this.running = false;
+        }
+        var wheel = new Wheel();
+        wheel.change = function(prefix) {
+            document.removeEventListener(wheel.event_name,wheel.handler);
+            wheel.running = true;
+            $('body').animate({
+                scrollTop : prefix + "=" + $(window).height()
+            },800,()=>{
+                document.addEventListener(wheel.event_name,wheel.handler);
+                wheel.running = false;
+            });
+        };
+        wheel.handler = function(event) {
+            var delta = event.deltaY || event.wheelDelta || event.detail;
+            wheel.count += (delta / Math.abs(delta));                
+            if (Math.abs(wheel.count) >= wheel.count_threshold) {
+                var prefix = "";
+
+                if (wheel.count > 0 && !wheel.inverse_wheel_direction)
+                    prefix = "+";
+                else
+                    prefix = "-";
+
+                if (((wheel.count > 0 && !wheel.inverse_wheel_direction) ? (document.body.scrollTop + $(window).height()) != document.body.scrollHeight : document.body.scrollTop != 0)) {
+                    wheel.change(prefix);
+                }
+                wheel.count = 0;
+            }
+        };
+        document.addEventListener(wheel.event_name,wheel.handler);
+        $(document).ready( () => {
+
+            document.body.scrollTop = 0;            
+            $(document).keydown(event => {
+                console.log(event.which);
+                switch(event.which) {
+                    case 38: //up
+                        if (document.body.scrollTop != 0 && !wheel.running)
+                            wheel.change("-");
+                        break;
+                    case 40: //down
+                        if (document.body.scrollTop + $(window).height() && !wheel.running)
+                            wheel.change("+");
+                        break;
+                    default:
+                        break;
+                }
+            });
+        });
+
+        </script>
+    </body>
+    
+</html>
